@@ -1,0 +1,62 @@
+{
+  "description": "Test cases used to validate the three decision branches of the triage policy end-to-end.",
+  "cases": [
+    {
+      "name": "auto_aprobar",
+      "input": {
+        "remitente": "proveedor@ejemplo.com",
+        "asunto": "Excepción de aprobación - Factura #4522",
+        "cuerpoCorreo": "Factura de $200 USD, PO-3310, discrepancia de precio del 2%"
+      },
+      "expected_decision": "auto_aprobar",
+      "actual_result": {
+        "proveedor": "proveedor@ejemplo.com",
+        "monto": 200,
+        "numero_po": "PO-3310",
+        "tipo_discrepancia": "precio",
+        "porcentaje_discrepancia": 2,
+        "decision": "auto_aprobar",
+        "confianza": 95,
+        "justificacion": "Monto bajo, discrepancia de precio mínima, alta confianza."
+      }
+    },
+    {
+      "name": "escalar",
+      "input": {
+        "remitente": "proveedor@ejemplo.com",
+        "asunto": "Excepción de aprobación - Factura #4521",
+        "cuerpoCorreo": "Factura de $650 USD, PO-9981, discrepancia de precio del 8%"
+      },
+      "expected_decision": "escalar",
+      "actual_result": {
+        "proveedor": "proveedor@ejemplo.com",
+        "monto": 650,
+        "numero_po": "PO-9981",
+        "tipo_discrepancia": "precio",
+        "porcentaje_discrepancia": 8,
+        "decision": "escalar",
+        "confianza": 90,
+        "justificacion": "Monto mayor de 500 USD, discrepancia de precio, confianza moderada."
+      }
+    },
+    {
+      "name": "rechazar_o_escalar_alta_prioridad",
+      "input": {
+        "remitente": "proveedor@ejemplo.com",
+        "asunto": "Excepción de aprobación - Factura #4523",
+        "cuerpoCorreo": "Factura de $8500 USD, sin número de PO encontrado"
+      },
+      "expected_decision": "rechazar_o_escalar_alta_prioridad",
+      "actual_result": {
+        "proveedor": "proveedor@ejemplo.com",
+        "monto": 8500,
+        "numero_po": null,
+        "tipo_discrepancia": "po_faltante",
+        "porcentaje_discrepancia": null,
+        "decision": "rechazar_o_escalar_alta_prioridad",
+        "confianza": 90,
+        "justificacion": "Monto alto, número de PO faltante, decisión escalada a alta prioridad."
+      }
+    }
+  ]
+}

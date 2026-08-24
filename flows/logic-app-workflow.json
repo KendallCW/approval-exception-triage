@@ -1,0 +1,110 @@
+{
+  "_comment": "Sanitized export of the Logic App workflow definition. Credentials, endpoints with account-identifying subdomains, and callback URLs have been replaced with placeholders. This reflects the validated, working version of the workflow.",
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "triggers": {
+      "When_a_HTTP_request_is_received": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "remitente": { "type": "string" },
+              "asunto": { "type": "string" },
+              "cuerpoCorreo": { "type": "string" },
+              "adjuntoNombre": { "type": "string" },
+              "adjuntoContenidoBase64": { "type": "string" }
+            },
+            "required": ["remitente", "asunto", "cuerpoCorreo"]
+          }
+        }
+      }
+    },
+    "actions": {
+      "HTTP": {
+        "type": "Http",
+        "inputs": {
+          "uri": "https://<TU_RECURSO_FOUNDRY>.services.ai.azure.com/openai/v1/chat/completions",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json",
+            "api-key": "<TU_API_KEY_AQUI>"
+          },
+          "body": {
+            "model": "Phi-4-mini-instruct",
+            "messages": [
+              {
+                "role": "user",
+                "content": "<ver prompts/extraction-classification-prompt.md — fusionado en un solo mensaje user, con @{triggerBody()?['remitente']}, @{triggerBody()?['asunto']}, @{triggerBody()?['cuerpoCorreo']} insertados al final>"
+              }
+            ],
+            "temperature": 0.1,
+            "max_tokens": 500,
+            "response_format": { "type": "json_object" }
+          }
+        },
+        "runAfter": {},
+        "runtimeConfiguration": {
+          "contentTransfer": { "transferMode": "Chunked" },
+          "secureData": { "properties": ["inputs"] }
+        }
+      },
+      "Parse_JSON_1": {
+        "type": "ParseJson",
+        "inputs": {
+          "content": "@body('HTTP')",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "choices": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "object",
+                      "properties": { "content": { "type": "string" } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "runAfter": { "HTTP": ["Succeeded"] }
+      },
+      "Parse_JSON_2": {
+        "type": "ParseJson",
+        "inputs": {
+          "content": "@first(body('Parse_JSON_1')?['choices'])?['message']?['content']",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "proveedor": { "type": "string" },
+              "monto": { "type": "number" },
+              "numero_po": { "type": ["string", "null"] },
+              "tipo_discrepancia": { "type": "string" },
+              "porcentaje_discrepancia": { "type": ["number", "null"] },
+              "decision": { "type": "string" },
+              "confianza": { "type": "number" },
+              "justificacion": { "type": "string" }
+            },
+            "required": ["proveedor", "monto", "decision", "confianza"]
+          }
+        },
+        "runAfter": { "Parse_JSON_1": ["Succeeded"] }
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "Http",
+        "inputs": {
+          "statusCode": 200,
+          "headers": { "Content-Type": "application/json" },
+          "body": "@body('Parse_JSON_2')"
+        },
+        "runAfter": { "Parse_JSON_2": ["Succeeded"] }
+      }
+    }
+  }
+}
