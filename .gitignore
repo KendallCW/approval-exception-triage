@@ -1,0 +1,15 @@
+# Secrets / config
+*.env
+local.settings.json
+*.pfx
+
+# Logic App / Power Automate exports that may contain live values
+# before sanitization — only the sanitized version in flows/ is committed
+*.raw-export.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
