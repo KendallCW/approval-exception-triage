@@ -6,7 +6,7 @@
 
 ## Why this project exists
 
-I'm a Business Analyst transitioning into Data/Cloud Engineering, with a near-term focus on the BA + applied-AI intersection — it's the more reachable path in the short term than a pure Data Engineer role without formal experience. Reading about Power Automate or Azure AI Foundry isn't the same as being the person who has to figure out why a small model is silently ignoring half your prompt, or why a workflow that ran fine a minute ago suddenly times out.
+I'm a Business Analyst building hands-on, evidence-backed experience to transition into Cloud, Data, and AI Engineering roles — proving I can design and ship real systems, not just describe them. Reading about Power Automate or Azure AI Foundry isn't the same as being the person who has to figure out why a small model is silently ignoring half your prompt, or why a workflow that ran fine a minute ago suddenly times out.
 
 **The scenario:** invoice/PO approval exceptions — price mismatches, missing POs, duplicate invoices — are a routine part of accounts-payable-adjacent BA work at companies like Abbott and P&G. Someone reads the exception, checks it against a few rules of thumb, and decides: approve it, escalate it, or reject it. This project takes that exact judgment call and expresses it as a documented, auditable automation, with an AI model doing the first pass and a human validating anything that isn't a clean approval.
 
